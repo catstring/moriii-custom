@@ -1,292 +1,174 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import Question from './Question';
-
-// Separate interfaces for different state types
-interface Responses {
-  [key: string]: string | string[];
-}
-
-interface TextConfirmed {
-  [key: string]: boolean;
-}
+import SurveySummary from './SurveySummary';
+import { standardQuestions, customQuestions } from './surveyQuestions';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 const SurveyForm: React.FC = () => {
   const [productType, setProductType] = useState<string | null>(null);
-  const [responses, setResponses] = useState<Responses>({});
-  const [textConfirmed, setTextConfirmed] = useState<TextConfirmed>({});
+  const [responses, setResponses] = useState<{ [key: string]: string | string[] }>({});
+  const [textConfirmed, setTextConfirmed] = useState<{ [key: string]: boolean }>({});
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
-  const refs = {
-    q2: useRef<HTMLDivElement>(null),
-    q3: useRef<HTMLDivElement>(null),
-    q4: useRef<HTMLDivElement>(null),
-    q5: useRef<HTMLDivElement>(null),
-    q6: useRef<HTMLDivElement>(null),
-    q7: useRef<HTMLDivElement>(null),
-    q8: useRef<HTMLDivElement>(null),
-    q9: useRef<HTMLDivElement>(null),
-    q10: useRef<HTMLDivElement>(null),
-    q11: useRef<HTMLDivElement>(null),
+  const handleProductTypeSelection = (type: string) => {
+    setIsFading(true);
+    setTimeout(() => {
+      setProductType(type);
+      setCurrentQuestionIndex(0);
+      setIsFading(false);
+    }, 500);
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-    ref?: React.RefObject<HTMLDivElement>
-  ) => {
-    setResponses({
-      ...responses,
-      [e.target.name]: e.target.value,
-    });
+  const handleNextQuestion = () => {
+    setIsFading(true);
+    setTimeout(() => {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setIsFading(false);
+    }, 500);
+  };
 
-    if (e.target.type !== 'text' && ref && ref.current) {
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex === 0) {
+      setIsFading(true);
       setTimeout(() => {
-        ref.current?.scrollIntoView({ behavior: 'smooth' });
+        setProductType(null);
+        setIsFading(false);
+      }, 500);
+    } else {
+      setIsFading(true);
+      setTimeout(() => {
+        setCurrentQuestionIndex(currentQuestionIndex - 1);
+        setIsFading(false);
       }, 500);
     }
   };
 
-  const handleConfirm = (name: string, ref?: React.RefObject<HTMLDivElement>) => {
+  const handleConfirm = (name: string) => {
     setTextConfirmed({
       ...textConfirmed,
       [name]: true,
     });
-    if (ref && ref.current) {
-      setTimeout(() => {
-        ref.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 500);
-    }
+    handleNextQuestion();
   };
 
-
-  const handleProductTypeSelection = (type: string) => {
-    setProductType(type);
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setResponses({
+      ...responses,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const handleSkip = (ref?: React.RefObject<HTMLDivElement>) => {
-    if (ref && ref.current) {
-      setTimeout(() => {
-        ref.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 500);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setResponses({
+      ...responses,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Survey Responses:', responses);
-    // Handle form submission here
+    setShowSummary(true);
   };
+
+  const questions = productType === 'standard' ? standardQuestions : customQuestions;
+  const totalQuestions = questions.length;
+
+  if (showSummary) {
+    return <SurveySummary responses={responses} productType={productType} />;
+  }
 
   if (!productType) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-4xl font-bold mb-6">請選擇訂製類型</h1>
+      <div className={`flex flex-col items-center justify-center min-h-screen transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+        <h1 className="text-4xl font-bold mb-6 text-center">選擇訂製類型</h1>
         <button
-          className="mb-4 px-6 py-3 bg-blue-500 text-white text-lg rounded hover:bg-blue-600"
+          className="mb-4 px-6 py-3 bg-blue-500 text-white text-lg rounded-full hover:bg-blue-600 shadow-md"
           onClick={() => handleProductTypeSelection('standard')}
         >
           常規品
         </button>
         <button
-          className="px-6 py-3 bg-green-500 text-white text-lg rounded hover:bg-green-600"
+          className="px-6 py-3 bg-green-500 text-white text-lg rounded-full hover:bg-green-600 shadow-md"
           onClick={() => handleProductTypeSelection('custom')}
         >
-          完全客製
+          完全訂製
         </button>
       </div>
     );
   }
 
+  const currentQuestion = questions[currentQuestionIndex];
+
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-12">
-      {productType === 'standard' && (
-        <>
-          <div>
-            <Question
-              question="商品名稱"
-              options={['商品A', '商品B', '商品C', '商品D']}
-              name="productName"
-              onChange={(e) => handleChange(e, refs.q2)}
-              type="radio"  // Changed to 'radio'
-            />
-          </div>
-          <div ref={refs.q2}>
-            <Question
-              question="尺寸"
-              options={[]}
-              name="size"
-              onChange={handleChange}
-              type="dimension"
-              confirmed={!!textConfirmed['size']}
-              onConfirm={() => handleConfirm('size', refs.q3)}
-            />
-          </div>
-          <div ref={refs.q3}>
-            <Question
-              question="木種"
-              options={['紅橡木', '白橡木', '梣木']}
-              name="woodType"
-              onChange={(e) => handleChange(e, refs.q4)}
-              type="radio"
-            />
-          </div>
-          <div ref={refs.q4}>
-            <Question
-              question="是否有電梯"
-              options={['是', '否']}
-              name="hasElevator"
-              onChange={(e) => handleChange(e, refs.q5)}
-              type="radio"
-            />
-          </div>
-          <div ref={refs.q5}>
-            <Question
-              question="是否能等待"
-              options={['是', '否']}
-              name="canWait"
-              onChange={(e) => handleChange(e, refs.q6)}
-              type="radio"
-            />
-          </div>
-          <div ref={refs.q6}>
-            <Question
-              question="備註"
-              options={[]}
-              name="remarks"
-              onChange={handleChange}
-              type="textarea"
-              confirmed={!!textConfirmed['remarks']}
-              onConfirm={() => handleConfirm('remarks', refs.q7)}
-            />
-          </div>
-          <div ref={refs.q7}>
-            <Question
-              question="聯絡資訊"
-              options={[]}
-              name="contactInfo"
-              onChange={handleChange}
-              type="contactInfo"
-              confirmed={!!textConfirmed['contactInfo']}
-              onConfirm={() => handleConfirm('contactInfo')}
-            />
-          </div>
-        </>
-      )}
+    <form onSubmit={handleSubmit} className="relative min-h-screen flex flex-col">
+      {/* Top Section with Question Card */}
+      <div className="flex-none h-[60vh] flex items-center justify-center bg-gray-200 p-6 relative">
+        <button
+          type="button"
+          className="absolute top-4 left-4 text-gray-500 hover:text-gray-600"
+          onClick={handlePreviousQuestion}
+        >
+          <FaArrowLeft size={24} />
+        </button>
 
-      {productType === 'custom' && (
-        <>
-          <div>
-            <Question
-              question="圖片草稿"
-              options={[]}
-              name="imageDraft"
-              onChange={handleChange}
-              type="file"
-            />
-            <button
-              type="button"
-              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-              onClick={() => handleSkip(refs.q2)}
-            >
-              Skip
-            </button>
+        <div className={`w-auto inline-block transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+          <div className="bg-white shadow-md rounded-lg p-6 inline-block">
+            <div className="text-center">
+              <Question
+                question={currentQuestion.question}
+                options={currentQuestion.options}
+                name={currentQuestion.name}
+                type={currentQuestion.type}
+                confirmed={!!textConfirmed[currentQuestion.name]}
+                onConfirm={() => handleConfirm(currentQuestion.name)}
+                onChange={currentQuestion.type === 'radio' ? handleRadioChange : handleChange}
+              />
+            </div>
           </div>
-          <div ref={refs.q2}>
-            <Question
-              question="尺寸"
-              options={[]}
-              name="size"
-              onChange={handleChange}
-              type="dimension"
-              confirmed={!!textConfirmed['size']}
-              onConfirm={() => handleConfirm('size', refs.q3)}
-            />
-          </div>
-          <div ref={refs.q3}>
-            <Question
-              question="木種"
-              options={['紅橡木', '白橡木', '梣木']}
-              name="woodType"
-              onChange={(e) => handleChange(e, refs.q4)}
-              type="radio"
-            />
-          </div>
-          <div ref={refs.q4}>
-            <Question
-              question="是否要求板材直拼"
-              options={['是', '否']}
-              name="requiresStraightGrain"
-              onChange={(e) => handleChange(e, refs.q5)}
-              type="radio"
-            />
-          </div>
-          <div ref={refs.q5}>
-            <Question
-              question="是否要求板材加厚"
-              options={['是', '否']}
-              name="requiresThickerBoard"
-              onChange={(e) => handleChange(e, refs.q6)}
-              type="radio"
-            />
-          </div>
-          <div ref={refs.q6}>
-            <Question
-              question="是否需要附加材料"
-              options={['是', '否']}
-              name="requiresAdditionalMaterial"
-              onChange={(e) => handleChange(e, refs.q7)}
-              type="radio"
-            />
-          </div>
-          <div ref={refs.q7}>
-            <Question
-              question="是否需要安裝牆面"
-              options={['是', '否']}
-              name="requiresWallInstallation"
-              onChange={(e) => handleChange(e, refs.q8)}
-              type="radio"
-            />
-          </div>
-          <div ref={refs.q8}>
-            <Question
-              question="數量"
-              options={[]}
-              name="quantity"
-              onChange={handleChange}
-              type="number"
-              confirmed={!!textConfirmed['quantity']}
-              onConfirm={() => handleConfirm('quantity', refs.q9)}
-            />
-          </div>
-          <div ref={refs.q9}>
-            <Question
-              question="備註"
-              options={[]}
-              name="remarks"
-              onChange={handleChange}
-              type="textarea"
-              confirmed={!!textConfirmed['remarks']}
-              onConfirm={() => handleConfirm('remarks', refs.q10)}
-            />
-          </div>
-          <div ref={refs.q10}>
-            <Question
-              question="聯絡資訊"
-              options={[]}
-              name="contactInfo"
-              onChange={handleChange}
-              type="contactInfo"
-              confirmed={!!textConfirmed['contactInfo']}
-              onConfirm={() => handleConfirm('contactInfo')}
-            />
-          </div>
-        </>
-      )}
+        </div>
+      </div>
 
-      <button
-        type="submit"
-        className="mt-12 px-6 py-3 bg-blue-500 text-white text-lg rounded hover:bg-blue-600"
-      >
-        Submit
-      </button>
+      {/* Middle Section */}
+      <div className={`flex-none h-[20vh] flex items-center justify-center bg-white p-4 transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+        <div className="text-center text-gray-500">
+          {/* Lorem Ipsum Placeholder */}
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        </div>
+      </div>
+
+      {/* Bottom Section */}
+      <div className="flex-none h-[20vh] bg-white p-6 flex items-center justify-between">
+        <div className="flex items-center">
+          {questions.map((_, index) => (
+            <div
+              key={index}
+              className={`h-2 ${index === currentQuestionIndex ? 'w-4' : 'w-2'} mx-1 rounded-full ${
+                index === currentQuestionIndex ? 'bg-blue-500' : 'bg-gray-300'
+              } transition-all duration-500`}
+            />
+          ))}
+        </div>
+
+        {currentQuestionIndex < totalQuestions - 1 ? (
+          <button
+            type="button"
+            className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 shadow-md"
+            onClick={() => handleConfirm(currentQuestion.name)}
+          >
+            <FaArrowRight size={20} />
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 shadow-md"
+          >
+            <FaArrowRight size={20} />
+          </button>
+        )}
+      </div>
     </form>
   );
 };

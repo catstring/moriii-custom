@@ -1,0 +1,126 @@
+import { QuestionProps } from './Question';
+
+export const standardQuestions: QuestionProps[] = [
+  {
+    question: "商品名稱",
+    options: ['商品A', '商品B', '商品C', '商品D'],
+    name: "productName",
+    type: "radio",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "尺寸",
+    options: [],
+    name: "size",
+    type: "dimension",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "木種",
+    options: ['紅橡木', '白橡木', '梣木'],
+    name: "woodType",
+    type: "radio",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "是否有電梯",
+    options: ['是', '否'],
+    name: "hasElevator",
+    type: "radio",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "是否能等待",
+    options: ['是', '否'],
+    name: "canWait",
+    type: "radio",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "備註",
+    options: [],
+    name: "remarks",
+    type: "textarea",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "聯絡資訊",
+    options: [],
+    name: "contactInfo",
+    type: "contactInfo",
+    onChange: (event) => console.log(event.target.value),
+  },
+];
+
+export const customQuestions: QuestionProps[] = [
+  {
+    question: "圖片草稿",
+    options: [],
+    name: "imageDraft",
+    type: "file",
+    onChange: (event) => console.log(event.target.value), 
+  },
+  {
+    question: "尺寸",
+    options: [],
+    name: "size",
+    type: "dimension",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "木種",
+    options: ['紅橡木', '白橡木', '梣木'],
+    name: "woodType",
+    type: "radio",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "是否要求板材直拼",
+    options: ['是', '否'],
+    name: "requiresStraightGrain",
+    type: "radio",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "是否要求板材加厚",
+    options: ['是', '否'],
+    name: "requiresThickerBoard",
+    type: "radio",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "是否需要附加材料",
+    options: ['是', '否'],
+    name: "requiresAdditionalMaterial",
+    type: "radio",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "是否需要安裝牆面",
+    options: ['是', '否'],
+    name: "requiresWallInstallation",
+    type: "radio",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "數量",
+    options: [],
+    name: "quantity",
+    type: "number",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "備註",
+    options: [],
+    name: "remarks",
+    type: "textarea",
+    onChange: (event) => console.log(event.target.value),
+  },
+  {
+    question: "聯絡資訊",
+    options: [],
+    name: "contactInfo",
+    type: "contactInfo",
+    onChange: (event) => console.log(event.target.value),
+  },
+];

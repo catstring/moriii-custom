@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface QuestionProps {
+export interface QuestionProps {
   question: string;
   options: string[];
   name: string;
@@ -17,33 +17,26 @@ const Question: React.FC<QuestionProps> = ({
   onChange,
   type,
   confirmed,
-  onConfirm,
 }) => {
+  const inputStyle = 'border border-gray-300 p-2 w-full text-sm'; // Utility function
+
   return (
-    <div className="min-h-[80vh] flex flex-col justify-center items-center mb-12">
-      <p className="text-2xl font-semibold mb-8 text-center">{question}</p>
-      <div className="space-y-6 w-full max-w-lg">
+    <div>
+      <p className="text-1xl font-semibold mb-8 text-center">{question}</p>
+      <div className="space-y-2 w-full max-w-lg">
         {type === 'text' && (
           <div className="flex flex-col space-y-2">
             <input
               type="text"
               name={name}
               onChange={onChange}
-              className="border border-gray-300 p-2 w-full"
+              className={inputStyle}
               disabled={confirmed}
             />
-            <button
-              type="button"
-              className={`px-4 py-2 bg-blue-500 text-white rounded ${confirmed ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
-              onClick={onConfirm}
-              disabled={confirmed}
-            >
-              確定
-            </button>
           </div>
         )}
 
-{type === 'dimension' && (
+        {type === 'dimension' && (
           <div className="flex flex-col space-y-2">
             <div className="flex space-x-2">
               <input
@@ -51,30 +44,26 @@ const Question: React.FC<QuestionProps> = ({
                 placeholder="長"
                 name={`${name}-length`}
                 onChange={onChange}
-                className="border border-gray-300 p-2 w-full"
+                className={inputStyle}
+                disabled={confirmed}
               />
               <input
                 type="text"
                 placeholder="寬"
                 name={`${name}-width`}
                 onChange={onChange}
-                className="border border-gray-300 p-2 w-full"
+                className={inputStyle}
+                disabled={confirmed}
               />
               <input
                 type="text"
                 placeholder="高"
                 name={`${name}-height`}
                 onChange={onChange}
-                className="border border-gray-300 p-2 w-full"
+                className={inputStyle}
+                disabled={confirmed}
               />
             </div>
-            <button
-              type="button"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={onConfirm}
-            >
-              確定
-            </button>
           </div>
         )}
 
@@ -83,17 +72,9 @@ const Question: React.FC<QuestionProps> = ({
             <textarea
               name={name}
               onChange={onChange}
-              className="border border-gray-300 p-2 w-full"
+              className={inputStyle}
               disabled={confirmed}
             />
-            <button
-              type="button"
-              className={`px-4 py-2 bg-blue-500 text-white rounded ${confirmed ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
-              onClick={onConfirm}
-              disabled={confirmed}
-            >
-              確定
-            </button>
           </div>
         )}
 
@@ -101,7 +82,7 @@ const Question: React.FC<QuestionProps> = ({
           <select
             name={name}
             onChange={onChange}
-            className="border border-gray-300 p-2 w-full"
+            className={inputStyle}
           >
             <option value="">Select an option</option>
             {options.map((option, index) => (
@@ -123,7 +104,7 @@ const Question: React.FC<QuestionProps> = ({
                 onChange={onChange}
                 className="mr-4 h-5 w-5"
               />
-              <label htmlFor={`${name}-${index}`} className="text-lg">
+              <label htmlFor={`${name}-${index}`} className="text-sm">  {/* Utility class not applied to label */}
                 {option}
               </label>
             </div>
@@ -141,7 +122,7 @@ const Question: React.FC<QuestionProps> = ({
                 onChange={onChange}
                 className="mr-4 h-5 w-5"
               />
-              <label htmlFor={`${name}-${index}`} className="text-lg">
+              <label htmlFor={`${name}-${index}`} className="text-sm">  {/* Utility class not applied to label */}
                 {option}
               </label>
             </div>
@@ -153,7 +134,7 @@ const Question: React.FC<QuestionProps> = ({
             type="file"
             name={name}
             onChange={onChange}
-            className="border border-gray-300 p-2 w-full"
+            className={inputStyle}  // Applied utility style
           />
         )}
 
@@ -163,17 +144,9 @@ const Question: React.FC<QuestionProps> = ({
               type="number"
               name={name}
               onChange={onChange}
-              className="border border-gray-300 p-2 w-full"
+              className={inputStyle}  // Applied utility style
               disabled={confirmed}
             />
-            <button
-              type="button"
-              className={`px-4 py-2 bg-blue-500 text-white rounded ${confirmed ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
-              onClick={onConfirm}
-              disabled={confirmed}
-            >
-              確定
-            </button>
           </div>
         )}
 
@@ -184,7 +157,7 @@ const Question: React.FC<QuestionProps> = ({
               placeholder="姓名"
               name={`${name}-name`}
               onChange={onChange}
-              className="border border-gray-300 p-2 w-full"
+              className={inputStyle}  // Applied utility style
               disabled={confirmed}
             />
             <input
@@ -192,7 +165,7 @@ const Question: React.FC<QuestionProps> = ({
               placeholder="電話"
               name={`${name}-phone`}
               onChange={onChange}
-              className="border border-gray-300 p-2 w-full"
+              className={inputStyle}  // Applied utility style
               disabled={confirmed}
             />
             <input
@@ -200,17 +173,9 @@ const Question: React.FC<QuestionProps> = ({
               placeholder="E-mail"
               name={`${name}-email`}
               onChange={onChange}
-              className="border border-gray-300 p-2 w-full"
+              className={inputStyle}  // Applied utility style
               disabled={confirmed}
             />
-            <button
-              type="button"
-              className={`px-4 py-2 bg-blue-500 text-white rounded ${confirmed ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
-              onClick={onConfirm}
-              disabled={confirmed}
-            >
-              確定
-            </button>
           </div>
         )}
       </div>

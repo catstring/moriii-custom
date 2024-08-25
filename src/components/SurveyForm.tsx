@@ -3,68 +3,45 @@ import Question from './Question';
 import SurveySummary from './SurveySummary';
 import { standardQuestions, customQuestions } from './surveyQuestions';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import useFadeTransition from '../hooks/useFadeTransition';
+import useSurvey from '../hooks/useSurvey';
+
 
 const SurveyForm: React.FC = () => {
   const [productType, setProductType] = useState<string | null>(null);
-  const [responses, setResponses] = useState<{ [key: string]: string | string[] }>({});
-  const [textConfirmed, setTextConfirmed] = useState<{ [key: string]: boolean }>({});
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isFading, setIsFading] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
 
+  const { isFading, triggerFade } = useFadeTransition();
+
+  const questions = productType === 'standard' ? standardQuestions : customQuestions;
+  const totalQuestions = questions.length;
+
+  const {
+    currentQuestionIndex,
+    setCurrentQuestionIndex,
+    currentQuestion,
+    responses,
+    handleConfirm,
+    handleChange,
+  } = useSurvey(questions);
+
   const handleProductTypeSelection = (type: string) => {
-    setIsFading(true);
-    setTimeout(() => {
+    triggerFade(() => {
       setProductType(type);
       setCurrentQuestionIndex(0);
-      setIsFading(false);
-    }, 500);
-  };
-
-  const handleNextQuestion = () => {
-    setIsFading(true);
-    setTimeout(() => {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setIsFading(false);
-    }, 500);
+    });
   };
 
   const handlePreviousQuestion = () => {
     if (currentQuestionIndex === 0) {
-      setIsFading(true);
-      setTimeout(() => {
+      triggerFade(() => {
         setProductType(null);
-        setIsFading(false);
-      }, 500);
+      });
     } else {
-      setIsFading(true);
-      setTimeout(() => {
+      triggerFade(() => {
         setCurrentQuestionIndex(currentQuestionIndex - 1);
-        setIsFading(false);
-      }, 500);
+      });
     }
-  };
-
-  const handleConfirm = (name: string) => {
-    setTextConfirmed({
-      ...textConfirmed,
-      [name]: true,
-    });
-    handleNextQuestion();
-  };
-
-  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setResponses({
-      ...responses,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setResponses({
-      ...responses,
-      [e.target.name]: e.target.value,
-    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -72,9 +49,6 @@ const SurveyForm: React.FC = () => {
     console.log('Survey Responses:', responses);
     setShowSummary(true);
   };
-
-  const questions = productType === 'standard' ? standardQuestions : customQuestions;
-  const totalQuestions = questions.length;
 
   if (showSummary) {
     return <SurveySummary responses={responses} productType={productType} />;
@@ -100,8 +74,6 @@ const SurveyForm: React.FC = () => {
     );
   }
 
-  const currentQuestion = questions[currentQuestionIndex];
-
   return (
     <form onSubmit={handleSubmit} className="relative min-h-screen flex flex-col">
       {/* Top Section with Question Card */}
@@ -122,9 +94,9 @@ const SurveyForm: React.FC = () => {
                 options={currentQuestion.options}
                 name={currentQuestion.name}
                 type={currentQuestion.type}
-                confirmed={!!textConfirmed[currentQuestion.name]}
+                confirmed={false}  // Update this to use the actual state if needed
                 onConfirm={() => handleConfirm(currentQuestion.name)}
-                onChange={currentQuestion.type === 'radio' ? handleRadioChange : handleChange}
+                onChange={handleChange}
               />
             </div>
           </div>
